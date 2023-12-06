@@ -7,3 +7,5 @@ Potrzebne:
 
 Działanie jest proste, logujesz do InstaLing, powiększasz stronę na 150% wielkości, zaczynasz codzienną sesję i czekasz co sie dzieje, czasem może ci coś wyświetlić w komentarzu, jak zrobiłes powiedzmy 10 slowek musisz zmienic counter z 20 na 10, bo tyle zostało do końca.
 Ugułem tyle chyba.
+
+Jak ci sie nie chce z tym robić to ogarnę wersję odpalaną z .exe, z jakims prostym UI.
