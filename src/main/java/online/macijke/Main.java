@@ -20,15 +20,16 @@ public class Main {
     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd hh mm ss a");
     private static String fileNamed;
     private static String previousWord = "";
-    private static int counter = 20;
+    private static int counter = 2;
     public void doAJob(Main main, Tesseract tesseract, Tesseract tesseractDE, Robot robot) throws Exception {
         String screenText;
         for (int i = 0; i < counter; i++) {
-            File listOfWords = new File("C:\\BOT\\slowka.txt");
+            File listOfWords = new File("D:\\slowkaBaza.txt");
             Map<String, String> mapWords = main.getWordsMap(listOfWords);
             Thread.sleep(1000);
             main.roboSS(680, 250, 600, 110);
             screenText = tesseract.doOCR(new File("C:\\BOT\\" + fileNamed + ".jpg")).trim();
+            System.out.println(screenText);
             String word = mapWords.get(screenText);
             if (previousWord.equals(word)) {
                 System.out.println("Słówko się powtarza kolejny raz!");
@@ -79,7 +80,7 @@ public class Main {
         main.roboSS(680, 250, 600, 60);
         Thread.sleep(900);
         String value = tesseractDE.doOCR(new File("C:\\BOT\\" + fileNamed + ".jpg")).trim();
-        appendToFile("C:\\BOT\\slowka.txt", screenText, value);
+        appendToFile("D:\\slowkaBaza.txt", screenText, value);
         Thread.sleep(200);
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
@@ -118,6 +119,14 @@ public class Main {
     }
 
     public static void main(String[] args) throws AWTException {
+//        JFrame jFrame = new JFrame();
+//        jFrame.setFont(new Font("Arial", Font.PLAIN, 35));
+//        jFrame.setLayout(new FlowLayout());
+//        jFrame.setBounds(0,0, 350, 425);
+//        jFrame.setPreferredSize(new Dimension(350, 425));
+//        jFrame.setVisible(true);
+//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
         Robot robot = new Robot();
         Tesseract tesseract = new Tesseract();
         tesseract.setLanguage("pol");
@@ -125,10 +134,15 @@ public class Main {
         tesseractDE.setLanguage("deu");
         Main main = new Main();
 
-        JFrame frame = new JFrame("InstaLing BOT");
-        frame.setBounds(0, 0 ,200, 200);
-        frame.setVisible(true);
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+//        JLabel lInfo = new JLabel("F6 aby uruchomić bota.\n");
+//        lInfo.setVisible(true);
+//        lInfo.setBounds(0,0, 350, 50);
+//        jFrame.add(lInfo);
+//
+//        JLabel lInfoStop = new JLabel("F7 aby zatrzymać bota.");
+//        lInfoStop.setVisible(true);
+//        lInfoStop.setBounds(0,200, 350, 50);
+//        jFrame.add(lInfoStop);
         try {
             tesseract.setDatapath(".\\Tess4J\\tessdata");
             tesseractDE.setDatapath(".\\Tess4J\\tessdata");
