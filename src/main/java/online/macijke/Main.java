@@ -1,5 +1,8 @@
 package online.macijke;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import net.sourceforge.tess4j.Tesseract;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,59 +17,64 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Main {
 
     SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd hh mm ss a");
     private static String fileNamed;
     private static String previousWord = "";
-    private static int counter = 2;
+    private static int counter = 20;
+    private static Main main;
+    private static Tesseract tesseractPL;
+    private static Tesseract tesseractDE;
+    private static Robot robot;
     public void doAJob(Main main, Tesseract tesseract, Tesseract tesseractDE, Robot robot) throws Exception {
-        String screenText;
-        for (int i = 0; i < counter; i++) {
-            File listOfWords = new File("D:\\slowkaBaza.txt");
-            Map<String, String> mapWords = main.getWordsMap(listOfWords);
-            Thread.sleep(1000);
-            main.roboSS(680, 250, 600, 110);
-            screenText = tesseract.doOCR(new File("C:\\BOT\\" + fileNamed + ".jpg")).trim();
-            System.out.println(screenText);
-            String word = mapWords.get(screenText);
-            if (previousWord.equals(word)) {
-                System.out.println("Słówko się powtarza kolejny raz!");
-                System.exit(0);
+            String screenText;
+            for (int i = 0; i < counter; i++) {
+                File listOfWords = new File("C:\\BOT\\slowka.txt");
+                Map<String, String> mapWords = main.getWordsMap(listOfWords);
+                Thread.sleep(1000);
+                main.roboSS(680, 260, 600, 100);
+                screenText = tesseract.doOCR(new File("C:\\BOT\\" + fileNamed + ".jpg")).trim();
+                String word = mapWords.get(screenText);
+                if (previousWord.equals(word)) {
+                    System.out.println("Słówko się powtarza kolejny raz!");
+                    if (new File("C:\\BOT\\" + fileNamed + ".jpg").delete()) System.out.println("Wyczyszczono pamięć!");
+                    break;
+                }
+                if (word == null) {
+                    main.addWordToList(screenText, robot, main, tesseractDE);
+                    i--;
+                    continue;
+                }
+                StringSelection selection = new StringSelection(word);
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                clipboard.setContents(selection, selection);
+                robot.mouseMove(935, 435);
+                Thread.sleep(200);
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                Thread.sleep(200);
+                robot.keyPress(KeyEvent.VK_CONTROL);
+                Thread.sleep(100);
+                robot.keyPress(KeyEvent.VK_V);
+                Thread.sleep(100);
+                robot.keyRelease(KeyEvent.VK_V);
+                Thread.sleep(100);
+                robot.keyRelease(KeyEvent.VK_CONTROL);
+                Thread.sleep(200);
+                robot.mouseMove(954, 546);
+                Thread.sleep(200);
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                Thread.sleep(800);
+                robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+                robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                Thread.sleep(250);
+                if (new File("C:\\BOT\\" + fileNamed + ".jpg").delete()) System.out.println("Wyczyszczono pamięć!");
+                previousWord = word;
             }
-            if (word==null) {
-                main.addWordToList(screenText, robot, main, tesseractDE);
-                i--;
-                continue;
-            }
-            StringSelection selection = new StringSelection(word);
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            clipboard.setContents(selection, selection);
-            robot.mouseMove(935, 435);
-            Thread.sleep(200);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(200);
-            robot.keyPress(KeyEvent.VK_CONTROL);
-            Thread.sleep(100);
-            robot.keyPress(KeyEvent.VK_V);
-            Thread.sleep(100);
-            robot.keyRelease(KeyEvent.VK_V);
-            Thread.sleep(100);
-            robot.keyRelease(KeyEvent.VK_CONTROL);
-            Thread.sleep(200);
-            robot.mouseMove(954, 546);
-            Thread.sleep(200);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(800);
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-            Thread.sleep(250);
-            if (new File("C:\\BOT\\" + fileNamed + ".jpg").delete()) System.out.println("Wyczyszczono pamięć!");
-            previousWord = word;
-        }
     }
 
     public void addWordToList(String screenText, Robot robot, Main main, Tesseract tesseractDE) throws Exception {
@@ -77,10 +85,10 @@ public class Main {
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
         Thread.sleep(400);
-        main.roboSS(680, 250, 600, 60);
+        main.roboSS(680, 260, 600, 60);
         Thread.sleep(900);
         String value = tesseractDE.doOCR(new File("C:\\BOT\\" + fileNamed + ".jpg")).trim();
-        appendToFile("D:\\slowkaBaza.txt", screenText, value);
+        appendToFile("C:\\BOT\\slowka.txt", screenText, value);
         Thread.sleep(200);
         robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
         robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
@@ -119,39 +127,22 @@ public class Main {
     }
 
     public static void main(String[] args) throws AWTException {
-//        JFrame jFrame = new JFrame();
-//        jFrame.setFont(new Font("Arial", Font.PLAIN, 35));
-//        jFrame.setLayout(new FlowLayout());
-//        jFrame.setBounds(0,0, 350, 425);
-//        jFrame.setPreferredSize(new Dimension(350, 425));
-//        jFrame.setVisible(true);
-//        jFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        Robot robot = new Robot();
-        Tesseract tesseract = new Tesseract();
-        tesseract.setLanguage("pol");
-        Tesseract tesseractDE = new Tesseract();
+        //new Frame();
+        robot = new Robot();
+        tesseractPL = new Tesseract();
+        tesseractPL.setLanguage("pol");
+        tesseractDE = new Tesseract();
         tesseractDE.setLanguage("deu");
-        Main main = new Main();
+        main = new Main();
 
-//        JLabel lInfo = new JLabel("F6 aby uruchomić bota.\n");
-//        lInfo.setVisible(true);
-//        lInfo.setBounds(0,0, 350, 50);
-//        jFrame.add(lInfo);
-//
-//        JLabel lInfoStop = new JLabel("F7 aby zatrzymać bota.");
-//        lInfoStop.setVisible(true);
-//        lInfoStop.setBounds(0,200, 350, 50);
-//        jFrame.add(lInfoStop);
         try {
-            tesseract.setDatapath(".\\Tess4J\\tessdata");
-            tesseractDE.setDatapath(".\\Tess4J\\tessdata");
-            main.doAJob(main, tesseract, tesseractDE, robot);
+            tesseractPL.setDatapath("C:\\BOT\\Tess4J\\tessdata");
+            tesseractDE.setDatapath("C:\\BOT\\Tess4J\\tessdata");
+            main.doAJob(main, tesseractPL, tesseractDE, robot);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
 
     }
-
 }
